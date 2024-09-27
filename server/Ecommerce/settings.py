@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "products",
+    "rest_framework"
 ]
 
 MIDDLEWARE = [
@@ -123,3 +125,15 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ecommerce_db',  # Replace with your database name
+        'USER': 'root',           # Replace with your MySQL username
+        'PASSWORD': 'yourpassword',  # Replace with your MySQL password
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
