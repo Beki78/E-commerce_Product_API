@@ -127,13 +127,13 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ecommerce_db',  # Replace with your database name
-        'USER': 'root',           # Replace with your MySQL username
-        'PASSWORD': 'yourpassword',  # Replace with your MySQL password
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'ecommerce_db',  # Replace with your database name
+#         'USER': 'root',           # Replace with your MySQL username
+#         'PASSWORD': 'yourpassword',  # Replace with your MySQL password
+#         'HOST': 'localhost',
+#         'PORT': '3306',
+#     }
+# }

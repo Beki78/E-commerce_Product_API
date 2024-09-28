@@ -2,6 +2,33 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+#* Category Schema
+class Category(models. Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+#* User Schema
+class User(AbstractUser):
+    is_buyer = models.BooleanField(default=False)
+    is_seller = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Set unique related names to avoid clashes
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='custom_user_groups',  # Change this to something unique
+        blank=True,
+        help_text='The groups this user belongs to.'
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='custom_user_permissions',  # Change this to something unique
+        blank=True,
+        help_text='Specific permissions for this user.'
+    )
+
 
 #* Product Schema
 class Product(models.Model):
@@ -16,13 +43,6 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
-#* Category Schema
-class Category(models. Models):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
 
 #* Review Schema
 class Review(models.Model):
@@ -34,17 +54,6 @@ class Review(models.Model):
 
     def __str__(self):
         return f'Review by {self.user.username} on {self.product.name}'
-
-#* Order Items Schema
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items')
-    quantity = models.IntegerField()
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-
-    def __str__(self):
-        return f'{self.quantity} of {self.product.name} in Order {self.order.id}'
-
 #* Order Schema
 class Order (models.Model):
     STATUS_CHOICES = [
@@ -58,14 +67,20 @@ class Order (models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.D
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'Order {self.id} by {self.user.username}'
 
-#* User Schema
-class User(AbstractUser):
-    is_buyer = models.BooleanField(default=False)
-    is_seller = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+
+#* Order Items Schema
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items')
+    quantity = models.IntegerField()
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f'{self.quantity} of {self.product.name} in Order {self.order.id}'
+
+

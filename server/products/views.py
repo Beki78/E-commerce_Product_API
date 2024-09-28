@@ -1,46 +1,38 @@
-from rest_framework import viewsets
-from .models import Product, Category, Order, OrderItem, Review, User
-from .serializers import ProductSerializer, CategorySerializer, OrderSerializer, OrderItemSerializer, ReviewSerializer, UserSerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from django.shortcuts import render
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework import status
+from .models import Product, Category
+from .serializers import ProductSerializer, CategorySerializer
 
-class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
 
-    def perform_create(self, serializer):
-        serializer.save()
+# Create your views here.
+@api_view(['GET'])
+def getProducts(request):
+    products = Product.objects.all()
+    serializedProduct = ProductSerializer(products, many = True).data
+    return Response(serializedProduct)
 
-class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+@api_view(['POST'])
+def createProducts(request):
+    data = request.data
+    serializedProduct = ProductSerializer(data = data)
+    if serializedProduct.is_valid():
+        serializedProduct.save()
+        return Response(serializedProduct.data, status = status.HTTP_201_CREATED)
+    return Response(serializedProduct.errors, status = status.HTTP_400_BAD_REQUEST)
 
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()
-    serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
+@api_view(['POST'])
+def createCategory(request):
+    data = request.data
+    serializedCategory = CategorySerializer(data = data)
+    if serializedCategory.is_valid():
+        serializedCategory.save()
+        return Response(serializedCategory.data, status = status.HTTP_201_CREATED)
+    return Response(serializedCategory.errors, status = status.HTTP_400_BAD_REQUEST)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-class OrderItemViewSet(viewsets.ModelViewSet):
-    queryset = OrderItem.objects.all()
-    serializer_class = OrderItemSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+@api_view(['GET'])
+def getCategory(request):
+    category = Category.objects.all()
+    serializedCategory = CategorySerializer(category, many = True).data
+    return Response(serializedCategory)
