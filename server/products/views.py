@@ -1,9 +1,13 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from rest_framework import status
+from rest_framework import status, generics
+from django.contrib.auth import authenticate
 from .models import Product, Category
-from .serializers import ProductSerializer, CategorySerializer
+from .serializers import ProductSerializer, CategorySerializer, UserRegistrationSerializer, UserLoginSerializer
+from rest_framework.permissions import AllowAny
+from .models import  User
+
 
 
 
@@ -93,3 +97,25 @@ def categoryDetails(request, pk):
             serializedCategory.save()
             return Response(serializedCategory.data)
         return Response(serializedCategory.errors, status = status.HTTP_400_BAD_REQUEST)
+
+
+
+class UserRegistrationView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegistrationSerializer
+    permission_classes = [AllowAny]
+
+class UserLoginView(generics.GenericAPIView):
+    serializer_class = UserLoginSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        email = serializer.validated_data['email']
+        password = serializer.validated_data['password']
+        user = authenticate(request, email=email, password=password)
+        
+        if user is not None:
+            return Response({'message': 'Login successful', 'user_id': user.id}, status=status.HTTP_200_OK)
+        return Response({'message': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)

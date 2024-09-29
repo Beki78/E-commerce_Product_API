@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Product, Category, Order, OrderItem, Review, User
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -39,7 +41,23 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'status', 'total_price', 'created_at', 'updated_at', 'order_items']
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'is_buyer', 'is_seller', 'created_at']
+        fields = ['username', 'email', 'password']
+
+    def create(self, validated_data):
+        user = User(
+            username=validated_data['username'],
+            email=validated_data['email'],
+         
+        )
+        user.set_password(validated_data['password'])  # Hash the password
+        user.save()
+        return user
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
