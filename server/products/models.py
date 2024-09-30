@@ -6,8 +6,7 @@ from django.db import models
 
 #* Category Schema
 class Category(models. Model):
-    email = models.EmailField(unique=True)
-    username = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
 
     def __str__(self):

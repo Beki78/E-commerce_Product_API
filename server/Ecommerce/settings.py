@@ -38,10 +38,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "products",
-    "rest_framework"
+    "rest_framework",
+    "corsheaders"
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # Add this line
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -137,3 +140,32 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #         'PORT': '3306',
 #     }
 # }
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Your frontend URL
+    "https://example.com",     # Add your production URL
+]
+
+# Allow all origins (use with caution)
+# CORS_ALLOW_ALL_ORIGINS = True
+
+# Allow credentials (if you need to send cookies, authorization headers, etc.)
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow specific HTTP methods (optional)
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS",
+]
+
+# Allow specific headers (optional)
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-csrftoken",
+]

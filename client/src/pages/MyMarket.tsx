@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { IoBagAddOutline } from "react-icons/io5";
 import { MdEdit, MdDeleteForever } from "react-icons/md";
 import Navbar from "../components/Navbar";
@@ -6,49 +6,21 @@ import { MyContext } from "../context/state";
 import ProductModal from "../components/ProductModal";
 import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Footer5 from "../components/Footer";
 
 const MyMarket = () => {
-  const products = [
-    // Sample products array
-    {
-      id: 1,
-      name: "Product Name 1",
-      description: "This is a brief description of Product Name 1.",
-      price: 149.99,
-      stockQuantity: 20,
-      imageUrl:
-        "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      category: "Category 1",
-    },
-    {
-      id: 2,
-      name: "Product Name 2",
-      description: "This is a brief description of Product Name 2.",
-      price: 99.99,
-      stockQuantity: 15,
-      imageUrl:
-        "https://images.pexels.com/photos/276528/pexels-photo-276528.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      category: "Category 2",
-    },
-    {
-      id: 3,
-      name: "Product Name 3",
-      description: "This is a brief description of Product Name 3.",
-      price: 199.99,
-      stockQuantity: 5,
-      imageUrl:
-        "https://images.unsplash.com/photo-1646753522408-077ef9839300?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
-      category: "Electronics",
-    },
-  ];
-
   const context = useContext(MyContext);
 
   if (!context) {
     throw new Error("MyMarket must be used within a ContextProvider");
   }
 
-  const { setOpen, triggerEditModal, modalAction } = context;
+  const { products, setOpen, triggerEditModal, modalAction } = context;
+
+  // Optionally, you can fetch products on component mount if needed
+  useEffect(() => {
+    // Fetch or manipulate products if necessary
+  }, [products]);
 
   return (
     <>
@@ -80,11 +52,11 @@ const MyMarket = () => {
                 <p className="text-sm text-gray-600">{product.description}</p>
                 <div className="flex items-center">
                   <p className="text-lg font-semibold text-black cursor-auto my-3">
-                    ${product.price.toFixed(2)}
+                    ${product.price}
                   </p>
-                  {product.stockQuantity > 0 ? (
+                  {product.stock_quantity > 0 ? (
                     <span className="text-sm text-green-600 ml-5">
-                      In Stock: {product.stockQuantity}
+                      In Stock: {product.stock_quantity}
                     </span>
                   ) : (
                     <span className="text-sm text-red-600 ml-2">
@@ -100,13 +72,16 @@ const MyMarket = () => {
             <div className="absolute top-2 right-2 flex space-x-2 bg-white shadow-md shadow-black p-1 rounded-lg">
               <button
                 className="text-blue-600 hover:text-blue-800"
-                onClick={triggerEditModal} // Open the modal for editing
+                onClick={() => {
+                  // Set the product to edit in context if needed
+                  triggerEditModal();
+                }} // Open the modal for editing
               >
                 <MdEdit className="w-6 h-6" />
               </button>
               <button
                 className="text-red-600 hover:text-red-800"
-                onClick={() => setOpen(true)} // Delete action
+                onClick={() => setOpen(true)} // Open delete confirmation modal
               >
                 <MdDeleteForever className="w-6 h-6" />
               </button>
@@ -131,6 +106,7 @@ const MyMarket = () => {
         theme="light"
         transition={Bounce}
       />
+      <Footer5/>
     </>
   );
 };
