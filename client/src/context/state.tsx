@@ -2,14 +2,14 @@ import axios from "axios";
 import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { Bounce, toast } from "react-toastify";
 
-// Define the structure of a Product
+
 interface Products {
-  id: number; // Product ID
-  name: string; // Product name
-  description: string; // Product description
-  price: number; // Product price
-  imageUrl: string; // URL of the product image
-  stock_quantity: number; // Quantity in stock
+  id: number; 
+  name: string; 
+  description: string; 
+  price: number;
+  imageUrl: string;  
+  stock_quantity: number; 
   category: string;
 }
 
@@ -21,10 +21,10 @@ interface DialogContextType {
   modalAction: "edit" | "sell" | undefined;
   notify: () => void;
   notifyUpdate: () => void;
-  notifyDelete: () => void; // New notification for delete
-  triggerEditModal: () => void; // Function to open edit modal
-  triggerSellModal: () => void; // Function to open sell modal
-  loading: boolean; // Loading state for asynchronous actions
+  notifyDelete: () => void;
+  triggerEditModal: () => void; 
+  triggerSellModal: () => void; 
+  loading: boolean;
   products: Products[]; // List of products
   setProducts: (products: Products[]) => void; // Function to set products
   deleteProduct: (id: number) => void; // Function to delete product
