@@ -47,6 +47,7 @@ interface DialogContextType {
   productQuantity: string | number;
   productImageURL: string | number;
   updateProduct: () => void;
+  addProduct: () => void;
 }
 
 export const MyContext = createContext<DialogContextType | undefined>(
@@ -111,7 +112,7 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
   };
   const updateProduct = () => {
     if (currentId) {
-      console.log("productName");
+
 
       axios
         .put(`http://127.0.0.1:8000/api/product_details/${currentId}`, {
@@ -134,6 +135,31 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
           console.error("There was an error updating the product!", error);
         });
     }
+  };
+
+  const addProduct = () => {
+   
+    axios
+      .post("http://127.0.0.1:8000/api/products/create", {
+        id: currentId,
+        name: productName,
+        description: productDesc,
+        price: productPrice,
+        category: productCategory,
+        stock_quantity: productQuantity,
+        image_url: productImageURL,
+      })
+      .then((response) => {
+      setProducts((prevProducts) => [...prevProducts, response.data]);
+        setOpenEditModal(false);
+        toast.success("Product added successfully!");
+      })
+      .catch((error) => {
+        console.error("There was an error adding the product!", error);
+
+        // Notify the user of failure
+        toast.error("Error adding product, please try again.");
+      });
   };
   const triggerEditModal = () => {
     setModalAction("edit");
@@ -165,6 +191,8 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
       .get("http://127.0.0.1:8000/api/products")
       .then((response) => {
         setProducts(response.data);
+        console.log(response.data);
+        
         setLoading(true);
       })
       .catch((err) => {
@@ -204,6 +232,7 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
         productCategory,
         productQuantity,
         productImageURL,
+        addProduct,
       }}
     >
       {children}

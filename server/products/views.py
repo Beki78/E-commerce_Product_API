@@ -1,4 +1,3 @@
-
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status, generics
@@ -6,7 +5,7 @@ from django.contrib.auth import authenticate
 from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer, UserRegistrationSerializer, UserLoginSerializer
 from rest_framework.permissions import AllowAny
-from .models import  User   
+from .models import  User
 
 
 
