@@ -1,10 +1,9 @@
-  import React, { useContext } from "react";
+  import { useContext } from "react";
   import { IoBagAddOutline } from "react-icons/io5";
   import { MyContext } from "../context/state"; // Update this import to point to your context file
 
   const ProductCard = () => {
-    const { products } = useContext(MyContext) || { products: [] }; // Get products from context
-
+    const { products,setCurrentId } = useContext(MyContext) || { products: [] }; 
     return (
       <section
         id="ProductCard"
@@ -12,6 +11,10 @@
       >
         {products.map((product) => (
           <div
+             onClick={() => {
+            setCurrentId?.(product.id);
+             
+          }}
             key={product.id}
             className="w-72 bg-white shadow-md rounded-xl duration-300 hover:shadow-xl"
           >
@@ -28,7 +31,7 @@
                   {product.name}
                 </p>
                 <span className="text-gray-400 mr-3 uppercase text-xs">
-                  {product.category}
+                  {product.category.name}
                 </span>
                 <p className="text-sm text-gray-600">{product.description}</p>
                 <div className="flex items-center">

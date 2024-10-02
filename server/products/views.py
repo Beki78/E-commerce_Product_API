@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status, generics
@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate
 from .models import Product, Category
 from .serializers import ProductSerializer, CategorySerializer, UserRegistrationSerializer, UserLoginSerializer
 from rest_framework.permissions import AllowAny
-from .models import  User
+from .models import  User   
 
 
 
@@ -66,12 +66,12 @@ def productDetails(request, pk):
     try:
         product = Product.objects.get(pk = pk)
     except Product.DoesNotExist:
-        return Response({"error": "Product not found."},status = status.HTTP_400_NOT_FOUND)
+        return Response({"error": "Product not found."},status = status.HTTP_404_NOT_FOUND)
     
     if request.method == "DELETE":
         product.delete()
         return Response(status = status.HTTP_204_NO_CONTENT)
-    elif request.method == "PUT":
+    if request.method == "PUT":
         data = request.data
         serializedProduct = ProductSerializer(product, data= data)
         if serializedProduct.is_valid():

@@ -2,15 +2,19 @@ import axios from "axios";
 import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { Bounce, toast } from "react-toastify";
 
-
+interface Category {
+  id: number;
+  name: string;
+  description: string;
+}
 interface Products {
-  id: number; 
-  name: string; 
-  description: string; 
+  id: number;
+  name: string;
+  description: string;
   price: number;
-  imageUrl: string;  
-  stock_quantity: number; 
-  category: string;
+  imageUrl: string;
+  stock_quantity: number;
+  category: Category;
 }
 
 interface DialogContextType {
@@ -22,12 +26,27 @@ interface DialogContextType {
   notify: () => void;
   notifyUpdate: () => void;
   notifyDelete: () => void;
-  triggerEditModal: () => void; 
-  triggerSellModal: () => void; 
+  triggerEditModal: () => void;
+  triggerSellModal: () => void;
   loading: boolean;
   products: Products[]; // List of products
   setProducts: (products: Products[]) => void; // Function to set products
-  deleteProduct: (id: number) => void; // Function to delete product
+  deleteProduct: () => void; // Function to delete product
+  currentId: number | null;
+  setCurrentId: (id: number | null) => void;
+  setProductName: React.Dispatch<React.SetStateAction<string | number>>;
+  setProductDesc: React.Dispatch<React.SetStateAction<string | number>>;
+  setProductPrice: React.Dispatch<React.SetStateAction<string | number>>;
+  setProductCategory: React.Dispatch<React.SetStateAction<string | number>>;
+  setProductQuantity: React.Dispatch<React.SetStateAction<string | number>>;
+  setProductImageURL: React.Dispatch<React.SetStateAction<string | number>>;
+  productName: string | number;
+  productDesc: string | number;
+  productPrice: string | number;
+  productCategory: string | number;
+  productQuantity: string | number;
+  productImageURL: string | number;
+  updateProduct: () => void;
 }
 
 export const MyContext = createContext<DialogContextType | undefined>(
@@ -42,6 +61,13 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
   const [modalAction, setModalAction] = useState<"edit" | "sell">();
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Products[]>([]);
+  const [currentId, setCurrentId] = useState<number | null>(null);
+  const [productName, setProductName] = useState<string | number>("");
+  const [productDesc, setProductDesc] = useState<string | number>("");
+  const [productPrice, setProductPrice] = useState<string | number>("");
+  const [productCategory, setProductCategory] = useState<string | number>("");
+  const [productQuantity, setProductQuantity] = useState<string | number>("");
+  const [productImageURL, setProductImageURL] = useState<string | number>("");
 
   const notify = () => {
     toast.info("🦄 Wow so easy!", {
@@ -83,7 +109,32 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
       transition: Bounce,
     });
   };
+  const updateProduct = () => {
+    if (currentId) {
+      console.log("productName");
 
+      axios
+        .put(`http://127.0.0.1:8000/api/product_details/${currentId}`, {
+          id: currentId,
+          name: productName, 
+          description: productDesc,
+          price: productPrice,
+          category: productCategory,
+          stock_quantity: productQuantity,
+          image_url: productImageURL,
+        })
+        .then((response) => {
+          const updatedProducts = products.map((product) =>
+            product.id === currentId ? response.data : product
+          );
+          setProducts(updatedProducts);
+          notifyUpdate();
+        })
+        .catch((error) => {
+          console.error("There was an error updating the product!", error);
+        });
+    }
+  };
   const triggerEditModal = () => {
     setModalAction("edit");
     setOpenEditModal(true);
@@ -94,13 +145,14 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
     setOpenEditModal(true);
   };
 
-  const deleteProduct = (id: number) => {
+  const deleteProduct = () => {
+    console.log(currentId);
+
     axios
-      .delete(`http://127.0.0.1:8000/api/product_details/${id}`)
-      .then((response) => {
-        // Remove the product from the state
-        setProducts(products.filter((product) => product.id !== id));
-        setOpen(false)
+      .delete(`http://127.0.0.1:8000/api/product_details/${currentId}`)
+      .then(() => {
+        setProducts(products.filter((product) => product.id !== currentId));
+        setOpen(false);
         notifyDelete();
       })
       .catch((error) => {
@@ -136,7 +188,22 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
         loading,
         products,
         setProducts,
-        deleteProduct, // Add deleteProduct to context value
+        deleteProduct,
+        currentId,
+        setCurrentId,
+        updateProduct,
+        setProductName,
+        productName,
+        setProductDesc,
+        setProductPrice,
+        setProductCategory,
+        setProductQuantity,
+        setProductImageURL,
+        productDesc,
+        productPrice,
+        productCategory,
+        productQuantity,
+        productImageURL,
       }}
     >
       {children}
