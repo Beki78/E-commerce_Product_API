@@ -1,62 +1,40 @@
-
-
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
-  Disclosure,
-  DisclosureButton,
-  DisclosurePanel,
   Menu,
-  MenuButton,
-  MenuItem,
   MenuItems,
 } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import {
-  ChevronDownIcon,
-  FunnelIcon,
-  MinusIcon,
-  PlusIcon,
-} from "@heroicons/react/20/solid";
+import { FunnelIcon } from "@heroicons/react/20/solid";
 import ProductCard from "./ProductCard";
-import Pagination from "./Pagination";
+import { MyContext } from "../context/state";
+import axios from "axios";
 
-const sortOptions = [
-  { name: "Best Rating", href: "#", current: false },
-  { name: "Newest", href: "#", current: false },
-  { name: "Price: Low to High", href: "#", current: false },
-  { name: "Price: High to Low", href: "#", current: false },
-];
 const subCategories = [
-  { name: "Vehicle", href: "#" },
-  { name: "House", href: "#" },
-  { name: "Home Accesories", href: "#" },
-  { name: "Electronics", href: "#" },
-  { name: "Cloth", href: "#" },
-  { name: "Furniture", href: "#" },
+  { name: "Vehicle", href: "#", path: "VH" },
+  { name: "House", href: "#", path: "HM" },
+  { name: "Home Accesories", href: "#", path: "HA" },
+  { name: "Electronics", href: "#", path: "EL" },
+  { name: "Cloth", href: "#", path: "CL" },
+  { name: "Furniture", href: "#", path: "FN" },
+  { name: "Food", href: "#", path: "FD" },
 ];
-const filters = [
-  {
-    id: "Stock",
-    name: "Stock",
-    options: [
-      { value: "5+", label: "5+", checked: false },
-      { value: "10+", label: "10+", checked: false },
-      { value: "20+", label: "20+", checked: true },
-      { value: "50+", label: "Brown", checked: false },
-    ],
-  },
-];
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export default function Filter() {
+  const { setSelectedCategory, setProducts } = useContext(MyContext);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-
+const fetchProducts = () => {
+  axios
+    .get("http://127.0.0.1:8000/api/products")
+    .then((response) => {
+      setProducts(response.data); // Set the fetched products
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+};
   return (
     <div className="bg-white">
       <div>
@@ -94,60 +72,19 @@ export default function Filter() {
                 <ul role="list" className="px-2 py-3 font-medium text-gray-900">
                   {subCategories.map((category) => (
                     <li key={category.name}>
-                      <a href={category.href} className="block px-2 py-3">
+                      <a
+                        // href={category.href}
+                        onClick={() => {
+                          console.log("sd");
+                          setSelectedCategory(category.path);
+                        }}
+                        className="block px-2 py-3"
+                      >
                         {category.name}
                       </a>
                     </li>
                   ))}
                 </ul>
-
-                {filters.map((section) => (
-                  <Disclosure
-                    key={section.id}
-                    as="div"
-                    className="border-t border-gray-200 px-4 py-6"
-                  >
-                    <h3 className="-mx-2 -my-3 flow-root">
-                      <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                        <span className="font-medium text-gray-900">
-                          {section.name}
-                        </span>
-                        <span className="ml-6 flex items-center">
-                          <PlusIcon
-                            aria-hidden="true"
-                            className="h-5 w-5 group-data-[open]:hidden"
-                          />
-                          <MinusIcon
-                            aria-hidden="true"
-                            className="h-5 w-5 [.group:not([data-open])_&]:hidden"
-                          />
-                        </span>
-                      </DisclosureButton>
-                    </h3>
-                    <DisclosurePanel className="pt-6">
-                      <div className="space-y-6">
-                        {section.options.map((option, optionIdx) => (
-                          <div key={option.value} className="flex items-center">
-                            <input
-                              defaultValue={option.value}
-                              defaultChecked={option.checked}
-                              id={`filter-mobile-${section.id}-${optionIdx}`}
-                              name={`${section.id}[]`}
-                              type="checkbox"
-                              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                            />
-                            <label
-                              htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
-                              className="ml-3 min-w-0 flex-1 text-gray-500"
-                            >
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </DisclosurePanel>
-                  </Disclosure>
-                ))}
               </form>
             </DialogPanel>
           </div>
@@ -161,21 +98,11 @@ export default function Filter() {
 
             <div className="flex items-center">
               <Menu as="div" className="relative inline-block text-left">
-                <div>
-                  <MenuButton className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-                    Sort
-                    <ChevronDownIcon
-                      aria-hidden="true"
-                      className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                    />
-                  </MenuButton>
-                </div>
-
                 <MenuItems
                   transition
                   className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                 >
-                  <div className="py-1">
+                  {/* <div className="py-1">
                     {sortOptions.map((option) => (
                       <MenuItem key={option.name}>
                         <a
@@ -191,11 +118,10 @@ export default function Filter() {
                         </a>
                       </MenuItem>
                     ))}
-                  </div>
+                  </div> */}
                 </MenuItems>
               </Menu>
 
-             
               <button
                 type="button"
                 onClick={() => setMobileFiltersOpen(true)}
@@ -217,70 +143,33 @@ export default function Filter() {
               <form className="hidden lg:block">
                 <h3 className="sr-only">Categories</h3>
                 <ul
+                  onClick={fetchProducts}
                   role="list"
-                  className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900"
+                  className="space-y-3  border-b w-full border-gray-200 pb-6 text-sm font-medium text-gray-900"
                 >
+                  <li className="w-full hover:bg-slate-100 pl-3 py-2 rounded-md  duration-200 ease-in-out">
+                    <a className=" cursor-pointer text-[1rem] font-bold ">
+                      ALL
+                    </a>
+                  </li>
                   {subCategories.map((category) => (
-                    <li key={category.name}>
-                      <a href={category.href}>{category.name}</a>
+                    <li
+                      key={category.name}
+                      onClick={() => {
+                        setSelectedCategory(category.path);
+                      }}
+                      className="w-full hover:bg-slate-100 pl-3 py-2 rounded-md duration-200 ease-in-out"
+                    >
+                      <a className=" cursor-pointer">{category.name}</a>
                     </li>
                   ))}
                 </ul>
-
-                {filters.map((section) => (
-                  <Disclosure
-                    key={section.id}
-                    as="div"
-                    className="border-b border-gray-200 py-6"
-                  >
-                    <h3 className="-my-3 flow-root">
-                      <DisclosureButton className="group flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                        <span className="font-medium text-gray-900">
-                          {section.name}
-                        </span>
-                        <span className="ml-6 flex items-center">
-                          <PlusIcon
-                            aria-hidden="true"
-                            className="h-5 w-5 group-data-[open]:hidden"
-                          />
-                          <MinusIcon
-                            aria-hidden="true"
-                            className="h-5 w-5 [.group:not([data-open])_&]:hidden"
-                          />
-                        </span>
-                      </DisclosureButton>
-                    </h3>
-                    <DisclosurePanel className="pt-6">
-                      <div className="space-y-4">
-                        {section.options.map((option, optionIdx) => (
-                          <div key={option.value} className="flex items-center">
-                            <input
-                              defaultValue={option.value}
-                              defaultChecked={option.checked}
-                              id={`filter-${section.id}-${optionIdx}`}
-                              name={`${section.id}[]`}
-                              type="checkbox"
-                              className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                            />
-                            <label
-                              htmlFor={`filter-${section.id}-${optionIdx}`}
-                              className="ml-3 text-sm text-gray-600"
-                            >
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </DisclosurePanel>
-                  </Disclosure>
-                ))}
               </form>
 
               {/* Product grid */}
 
               <div className="lg:col-span-3">
                 <ProductCard />
-                <Pagination/>
               </div>
             </div>
           </section>

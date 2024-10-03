@@ -5,7 +5,8 @@ from .views import (
     productDetails,
     getProduct,
     UserRegistrationView,
-    UserLoginView
+    UserLoginView,
+    getProductsByCategory
 )
 
 urlpatterns = [
@@ -13,6 +14,7 @@ urlpatterns = [
     path("products/create", createProducts, name="createProducts"),
     path("product_details/<int:pk>", productDetails, name="productDetails"),
     path("product/<int:pk>", getProduct, name="getProduct"),
+    path("products/category/<str:category>/", getProductsByCategory, name="getProductsByCategory"),
     path('register/', UserRegistrationView.as_view(), name='register'),
     path('login/', UserLoginView.as_view(), name='login'),
 ]

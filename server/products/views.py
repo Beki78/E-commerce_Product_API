@@ -47,12 +47,36 @@ def createProducts(request):
 # Filter products by category
 
 
+from rest_framework import status
+
 @api_view(['GET'])
 def getProductsByCategory(request, category):
     products = Product.objects.filter(category=category)
-    serializedProduct = ProductSerializer(products, many=True).data
-    return Response(serializedProduct)
 
+    # Check if products exist
+    if not products.exists():
+        return Response({"error": "No products found for this category."}, status=status.HTTP_200_OK)
+
+    serializedProduct = ProductSerializer(products, many=True)
+    return Response(serializedProduct.data, status=status.HTTP_200_OK)
+
+
+# @api_view(['GET'])
+# def getProductsByCategory(request, category):
+#     # Check if the category is one of "VH", "FD", or "CL"
+#     if category in ["VH", "FD", "CL", "EL", "FN", "HM", "HA"]:
+#         products = Product.objects.filter(category=category)
+
+#         # If no products exist, return a success response with a message
+#         if not products.exists():
+#             return Response({"message": "No products found for this category."}, status=status.HTTP_200_OK)
+
+#         # If products are found, serialize and return them
+#         serializedProduct = ProductSerializer(products, many=True)
+#         return Response(serializedProduct.data, status=status.HTTP_200_OK)
+
+#     # If the category is not one of "VH", "FD", or "CL", return a 404 error
+#     return Response({"error": "Invalid category."}, status=status.HTTP_404_NOT_FOUND)
 
 
 

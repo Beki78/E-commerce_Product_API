@@ -33,25 +33,12 @@ const ProductModal = ({ title, buttonName }: Props) => {
     productDesc,
     productPrice,
     productQuantity,
-    // productImageURL,
     productName,
     addProduct,
     categories,
   } = context;
-  const currentProduct = products.find((product) => product.id === currentId);
+ const currentProduct = products.find((product) => product.id === currentId);
 
-
-
-  // const [newProduct, setNewProduct] = useState({
-  //   name: "",
-  //   description: "",
-  //   price: 0,
-  //   category: "",
-  //   stock_quantity: 0,
-  //   image_url: "",
-  // });
-
-  // Update productName whenever currentProduct changes
   useEffect(() => {
     if (currentProduct) {
       setProductName(currentProduct.name || "");
@@ -60,8 +47,14 @@ const ProductModal = ({ title, buttonName }: Props) => {
       setProductCategory(currentProduct.category || "");
       setProductQuantity(currentProduct.stock_quantity || 0);
     }
-  }, [currentProduct]);
-
+  }, [
+    currentProduct,
+    setProductName,
+    setProductDesc,
+    setProductPrice,
+    setProductCategory,
+    setProductQuantity,
+  ]);
   return (
     <Dialog
       className="relative z-10"

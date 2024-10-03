@@ -26,6 +26,7 @@ const categoryMap: CategoryMap = {
           <div
             onClick={() => {
               setCurrentId?.(product.id);
+              
             }}
             key={product.id}
             className="w-72 bg-white shadow-md rounded-xl duration-300 hover:shadow-xl"

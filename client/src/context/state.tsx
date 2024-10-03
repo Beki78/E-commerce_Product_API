@@ -16,6 +16,7 @@ interface Products {
   category: string;
 }
 
+
 interface DialogContextType {
   open: boolean;
   setOpen: (value: boolean) => void;
@@ -47,7 +48,9 @@ interface DialogContextType {
   productImageURL: File | null;
   updateProduct: () => void;
   addProduct: () => void;
-  categories: Category[]; 
+  categories: Category[];
+  selectedCategory: string | number;
+  setSelectedCategory: (SubCategory: string) => void;
 }
 
 export const MyContext = createContext<DialogContextType | undefined>(
@@ -60,7 +63,7 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
   const [open, setOpen] = useState(false);
   const [openEditModal, setOpenEditModal] = useState(false);
   const [modalAction, setModalAction] = useState<"edit" | "sell">();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState<Products[]>([]);
   const [currentId, setCurrentId] = useState<number | null>(null);
   const [productName, setProductName] = useState<string | number>("");
@@ -69,6 +72,7 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
   const [productCategory, setProductCategory] = useState<string | number>("");
   const [productQuantity, setProductQuantity] = useState<string | number>("");
   const [productImageURL, setProductImageURL] = useState<File | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [categories] = useState<Category[]>([
     { id: "FD", name: "Food" },
     { id: "EL", name: "Electronics" },
@@ -119,75 +123,78 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
       transition: Bounce,
     });
   };
-const updateProduct = () => {
-  if (currentId) {
-    // Create a FormData object to hold the data
+  const updateProduct = () => {
+    if (currentId) {
+      // Create a FormData object to hold the data
+      const formData = new FormData();
+      formData.append("id", String(currentId));
+      formData.append("name", String(productName));
+      formData.append("description", String(productDesc));
+      formData.append("price", String(productPrice));
+      formData.append("category", String(productCategory));
+      formData.append("stock_quantity", String(productQuantity));
+
+      // Check if there's an image to upload
+      if (productImageURL) {
+        formData.append("image", productImageURL); // Assuming productImageURL is a File object
+      }
+
+      axios
+        .put(
+          `http://127.0.0.1:8000/api/product_details/${currentId}`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data", // Specify the content type
+            },
+          }
+        )
+        .then((response) => {
+          const updatedProducts = products.map((product) =>
+            product.id === currentId ? response.data : product
+          );
+          setProducts(updatedProducts);
+          notifyUpdate();
+        })
+        .catch((error) => {
+          console.error("There was an error updating the product!", error);
+        });
+    }
+  };
+
+  const addProduct = () => {
     const formData = new FormData();
-    formData.append("id", String(currentId));
-    formData.append("name", String(productName));
-    formData.append("description", String(productDesc));
-    formData.append("price", String(productPrice));
-    formData.append("category", String(productCategory));
+
+    // Append all necessary fields to formData
+    formData.append("name", String(productName)); // Convert to string
+    formData.append("description", String(productDesc)); // Convert to string
+    formData.append("price", String(productPrice)); // Convert to string
+    formData.append("category", String(productCategory)); // Convert to string
     formData.append("stock_quantity", String(productQuantity));
 
-    // Check if there's an image to upload
     if (productImageURL) {
-      formData.append("image", productImageURL); // Assuming productImageURL is a File object
+      console.log("Appending image:", productImageURL); // Log the file object
+      formData.append("image", productImageURL);
+    } else {
+      console.error("No image file selected!");
     }
 
     axios
-      .put(`http://127.0.0.1:8000/api/product_details/${currentId}`, formData, {
+      .post("http://127.0.0.1:8000/api/products/create", formData, {
         headers: {
-          "Content-Type": "multipart/form-data", // Specify the content type
+          "Content-Type": "multipart/form-data", // Ensure this header is set
         },
       })
       .then((response) => {
-        const updatedProducts = products.map((product) =>
-          product.id === currentId ? response.data : product
-        );
-        setProducts(updatedProducts);
-        notifyUpdate();
+        setProducts((prevProducts) => [...prevProducts, response.data]);
+        setOpenEditModal(false);
+        toast.success("Product added successfully!");
       })
       .catch((error) => {
-        console.error("There was an error updating the product!", error);
+        console.error("There was an error adding the product!", error);
+        toast.error("Error adding product, please try again.");
       });
-  }
-};
-
-
-const addProduct = () => {
-  const formData = new FormData();
-
-  // Append all necessary fields to formData
- formData.append("name", String(productName)); // Convert to string
- formData.append("description", String(productDesc)); // Convert to string
- formData.append("price", String(productPrice)); // Convert to string
- formData.append("category", String(productCategory)); // Convert to string
- formData.append("stock_quantity", String(productQuantity)); 
-
-  if (productImageURL) {
-    console.log("Appending image:", productImageURL); // Log the file object
-    formData.append("image", productImageURL);
-  } else {
-    console.error("No image file selected!");
-  }
-
-  axios
-    .post("http://127.0.0.1:8000/api/products/create", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data", // Ensure this header is set
-      },
-    })
-    .then((response) => {
-      setProducts((prevProducts) => [...prevProducts, response.data]);
-      setOpenEditModal(false);
-      toast.success("Product added successfully!");
-    })
-    .catch((error) => {
-      console.error("There was an error adding the product!", error);
-      toast.error("Error adding product, please try again.");
-    });
-};
+  };
 
   const triggerEditModal = () => {
     setModalAction("edit");
@@ -220,13 +227,33 @@ const addProduct = () => {
       .then((response) => {
         setProducts(response.data);
         console.log(response.data);
-        
-        setLoading(true);
+        setLoading(false);
       })
       .catch((err) => {
         console.error(err);
-      });
+      })
+      .finally(() => {
+         setLoading(false);
+      })
   }, []);
+
+  useEffect(() => {
+    if (selectedCategory) {
+      setLoading(true); // Set loading to true when fetching starts
+      axios
+        .get(`http://127.0.0.1:8000/api/products/category/${selectedCategory}`)
+        .then((response) => {
+          setProducts(response.data);
+          console.log(response.data);
+        })
+        .catch((err) => {
+          console.error(err);
+        })
+        .finally(() => {
+          setLoading(false); // Set loading to false when data is fetched
+        });
+    }
+  }, [selectedCategory]); // Ensure the hook re-triggers when selectedCategory changes
 
   return (
     <MyContext.Provider
@@ -262,6 +289,8 @@ const addProduct = () => {
         productImageURL,
         addProduct,
         categories,
+        setSelectedCategory,
+        selectedCategory,
       }}
     >
       {children}

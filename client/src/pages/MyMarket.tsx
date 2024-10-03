@@ -8,10 +8,12 @@ import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer5 from "../components/Footer";
 
+// Type for mapping categories
 interface CategoryMap {
-  [key: string]: string; // Any string key maps to a string value
+  [key: string]: string; // Maps category codes to their full names
 }
 
+// Category mapping
 const categoryMap: CategoryMap = {
   FD: "Food",
   EL: "Electronics",
@@ -21,41 +23,57 @@ const categoryMap: CategoryMap = {
   VH: "Vehicle",
   HA: "Home Accessories",
 };
-const baseURL = "http://127.0.0.1:8000"; 
+
+const baseURL = "http://127.0.0.1:8000";
 
 const MyMarket = () => {
   const context = useContext(MyContext);
 
+  // Check if context is available
   if (!context) {
     throw new Error("MyMarket must be used within a ContextProvider");
   }
 
-  const { products, setOpen, triggerEditModal, modalAction, setCurrentId } =
-    context;
+  // Destructure necessary values from context
+  const {
+    products,
+    setOpen,
+    triggerEditModal,
+    modalAction,
+    setCurrentId,
+    currentId,
+    loading,
+  } = context;
 
+  // Use effect can be used for side effects, but in this case, it's empty.
   useEffect(() => {}, [products]);
 
   return (
     <>
       <Navbar />
       <div className="min-h-screen">
-      
-        <section
-          id="ProductCard"
-          className="w-fit mx-auto  grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center gap-y-20 gap-x-14 mt-10 mb-5"
-        >
-          {products.map((product) => (
-            <div
-              onClick={() => {
-                setCurrentId?.(product.id);
-              }}
-              key={product.id}
-              className="relative w-72 bg-white shadow-md rounded-xl duration-300 hover:shadow-xl"
-            >
-          
+        {loading ? (
+          <p className="flex justify-center items-center  h-96   text-3xl font-semibold text-gray-600">
+            Loading...
+          </p>
+        ) : products.length === 0 ? (
+          <p className="text-center text-lg font-semibold text-gray-600">
+            No products available
+          </p>
+        ) : (
+          <section
+            id="ProductCard"
+            className="w-fit mx-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center gap-y-20 gap-x-14 mt-10 mb-5"
+          >
+            {products.map((product) => (
+              <div
+                onClick={() => setCurrentId(product.id)} 
+                key={product.id}
+                className="relative w-72 bg-white shadow-md rounded-xl duration-300 hover:shadow-xl"
+              >
                 <div className="overflow-hidden rounded-t-xl">
                   <img
-                    src={`${baseURL}${product.image_url}`} // Combine the base URL with the relative path
+                    src={`${baseURL}${product.image_url}`} // Combine base URL with relative path
                     alt={product.name}
                     className="h-80 w-72 object-cover transition-transform duration-300 hover:scale-105"
                   />
@@ -66,7 +84,6 @@ const MyMarket = () => {
                   </p>
                   <span className="text-gray-400 mr-3 uppercase text-xs">
                     {categoryMap[product.category] || product.category}
-                    {/* Display full name */}
                   </span>
                   <p className="text-sm text-gray-600">{product.description}</p>
                   <div className="flex items-center">
@@ -87,26 +104,32 @@ const MyMarket = () => {
                     </div>
                   </div>
                 </div>
-              <div className="absolute top-2 right-2 flex space-x-2 bg-white shadow-md shadow-black p-1 rounded-lg">
-                <button
-                  className="text-blue-600 hover:text-blue-800"
-                  onClick={() => {
-                    // Set the product to edit in context if needed
-                    triggerEditModal();
-                  }} // Open the modal for editing
-                >
-                  <MdEdit className="w-6 h-6" />
-                </button>
-                <button
-                  className="text-red-600 hover:text-red-800"
-                  onClick={() => setOpen(true)} // Open delete confirmation modal
-                >
-                  <MdDeleteForever className="w-6 h-6" />
-                </button>
+                <div className="absolute top-2 right-2 flex space-x-2 bg-white shadow-md shadow-black p-1 rounded-lg">
+                  <button
+                    className="text-blue-600 hover:text-blue-800"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent click from bubbling to parent div
+                      triggerEditModal();
+                    }} // Open the modal for editing
+                  >
+                    <MdEdit className="w-6 h-6" />
+                  </button>
+                  <button
+                    className="text-red-600 hover:text-red-800"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent click from bubbling to parent div
+                      setOpen(true); // Open delete confirmation modal
+                      console.log(currentId);
+                      
+                    }}
+                  >
+                    <MdDeleteForever className="w-6 h-6" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </section>
+            ))}
+          </section>
+        )}
       </div>
       <ProductModal
         title={modalAction === "sell" ? "Sell Product" : "Edit Product"} // Dynamic title
