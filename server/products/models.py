@@ -3,17 +3,11 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+# * User Schema
 
-#* Category Schema
-class Category(models. Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
 
-    def __str__(self):
-        return self.name
-#* User Schema
 class User(AbstractUser):
-  
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Set unique related names to avoid clashes
@@ -31,31 +25,49 @@ class User(AbstractUser):
     )
 
 
-#* Product Schema
+# * Product Schema
 class Product(models.Model):
+    class CategoryChoices(models.TextChoices):
+        FOOD = 'FD', 'Food'
+        ELECTRONICS = 'EL', 'Electronics'
+        CLOTHING = 'CL', 'Clothing'
+        FURNITURE = 'FN', 'Furniture'
+        HOME = 'HM', 'Home'
+        VEHICLE = 'VH', 'Vehicle'
+        HOMEACCESORIES = 'HA', 'HomeAccesories'
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock_quantity = models.IntegerField()
-    image_url = models.URLField(max_length=255, blank=True, null=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
+    image_url = models.ImageField(upload_to='images/', blank=True, null=True)
+    category = models.CharField(
+        max_length=2,
+        choices=CategoryChoices.choices,
+        default=CategoryChoices.FOOD
+    )
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now = True)
+    updated_at = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return self.name
 
 
-#* Review Schema
+# * Review Schema
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviews')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='reviews')
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='reviews')
     rating = models.IntegerField()
     comment = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Review by {self.user.username} on {self.product.name}'
-#* Order Schema
+# * Order Schema
+
+
 class Order (models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -64,8 +76,10 @@ class Order (models.Model):
         ('cancelled', 'Cancelled')
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='orders')
+    status = models.CharField(
+        max_length=50, choices=STATUS_CHOICES, default='pending')
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -74,14 +88,14 @@ class Order (models.Model):
         return f'Order {self.id} by {self.user.username}'
 
 
-#* Order Items Schema
+# * Order Items Schema
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items')
+    order = models.ForeignKey(
+        Order, on_delete=models.CASCADE, related_name='order_items')
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='order_items')
     quantity = models.IntegerField()
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
         return f'{self.quantity} of {self.product.name} in Order {self.order.id}'
-
-

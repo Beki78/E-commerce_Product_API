@@ -3,18 +3,17 @@ import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { Bounce, toast } from "react-toastify";
 
 interface Category {
-  id: number;
+  id: string;
   name: string;
-  description: string;
 }
 interface Products {
   id: number;
   name: string;
   description: string;
   price: number;
-  imageUrl: string;
+  image_url: string;
   stock_quantity: number;
-  category: Category;
+  category: string;
 }
 
 interface DialogContextType {
@@ -39,15 +38,16 @@ interface DialogContextType {
   setProductPrice: React.Dispatch<React.SetStateAction<string | number>>;
   setProductCategory: React.Dispatch<React.SetStateAction<string | number>>;
   setProductQuantity: React.Dispatch<React.SetStateAction<string | number>>;
-  setProductImageURL: React.Dispatch<React.SetStateAction<string | number>>;
+  setProductImageURL: React.Dispatch<React.SetStateAction<File | null>>;
   productName: string | number;
   productDesc: string | number;
   productPrice: string | number;
   productCategory: string | number;
   productQuantity: string | number;
-  productImageURL: string | number;
+  productImageURL: File | null;
   updateProduct: () => void;
   addProduct: () => void;
+  categories: Category[]; 
 }
 
 export const MyContext = createContext<DialogContextType | undefined>(
@@ -68,7 +68,16 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
   const [productPrice, setProductPrice] = useState<string | number>("");
   const [productCategory, setProductCategory] = useState<string | number>("");
   const [productQuantity, setProductQuantity] = useState<string | number>("");
-  const [productImageURL, setProductImageURL] = useState<string | number>("");
+  const [productImageURL, setProductImageURL] = useState<File | null>(null);
+  const [categories] = useState<Category[]>([
+    { id: "FD", name: "Food" },
+    { id: "EL", name: "Electronics" },
+    { id: "CL", name: "Clothing" },
+    { id: "FN", name: "Furniture" },
+    { id: "HM", name: "Home" },
+    { id: "VH", name: "Vehicle" },
+    { id: "HA", name: "Home Accessories" },
+  ]);
 
   const notify = () => {
     toast.info("🦄 Wow so easy!", {
@@ -110,57 +119,76 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
       transition: Bounce,
     });
   };
-  const updateProduct = () => {
-    if (currentId) {
+const updateProduct = () => {
+  if (currentId) {
+    // Create a FormData object to hold the data
+    const formData = new FormData();
+    formData.append("id", String(currentId));
+    formData.append("name", String(productName));
+    formData.append("description", String(productDesc));
+    formData.append("price", String(productPrice));
+    formData.append("category", String(productCategory));
+    formData.append("stock_quantity", String(productQuantity));
 
-
-      axios
-        .put(`http://127.0.0.1:8000/api/product_details/${currentId}`, {
-          id: currentId,
-          name: productName, 
-          description: productDesc,
-          price: productPrice,
-          category: productCategory,
-          stock_quantity: productQuantity,
-          image_url: productImageURL,
-        })
-        .then((response) => {
-          const updatedProducts = products.map((product) =>
-            product.id === currentId ? response.data : product
-          );
-          setProducts(updatedProducts);
-          notifyUpdate();
-        })
-        .catch((error) => {
-          console.error("There was an error updating the product!", error);
-        });
+    // Check if there's an image to upload
+    if (productImageURL) {
+      formData.append("image", productImageURL); // Assuming productImageURL is a File object
     }
-  };
 
-  const addProduct = () => {
-   
     axios
-      .post("http://127.0.0.1:8000/api/products/create", {
-        id: currentId,
-        name: productName,
-        description: productDesc,
-        price: productPrice,
-        category: productCategory,
-        stock_quantity: productQuantity,
-        image_url: productImageURL,
+      .put(`http://127.0.0.1:8000/api/product_details/${currentId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Specify the content type
+        },
       })
       .then((response) => {
-      setProducts((prevProducts) => [...prevProducts, response.data]);
-        setOpenEditModal(false);
-        toast.success("Product added successfully!");
+        const updatedProducts = products.map((product) =>
+          product.id === currentId ? response.data : product
+        );
+        setProducts(updatedProducts);
+        notifyUpdate();
       })
       .catch((error) => {
-        console.error("There was an error adding the product!", error);
-
-        // Notify the user of failure
-        toast.error("Error adding product, please try again.");
+        console.error("There was an error updating the product!", error);
       });
-  };
+  }
+};
+
+
+const addProduct = () => {
+  const formData = new FormData();
+
+  // Append all necessary fields to formData
+ formData.append("name", String(productName)); // Convert to string
+ formData.append("description", String(productDesc)); // Convert to string
+ formData.append("price", String(productPrice)); // Convert to string
+ formData.append("category", String(productCategory)); // Convert to string
+ formData.append("stock_quantity", String(productQuantity)); 
+
+  if (productImageURL) {
+    console.log("Appending image:", productImageURL); // Log the file object
+    formData.append("image", productImageURL);
+  } else {
+    console.error("No image file selected!");
+  }
+
+  axios
+    .post("http://127.0.0.1:8000/api/products/create", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data", // Ensure this header is set
+      },
+    })
+    .then((response) => {
+      setProducts((prevProducts) => [...prevProducts, response.data]);
+      setOpenEditModal(false);
+      toast.success("Product added successfully!");
+    })
+    .catch((error) => {
+      console.error("There was an error adding the product!", error);
+      toast.error("Error adding product, please try again.");
+    });
+};
+
   const triggerEditModal = () => {
     setModalAction("edit");
     setOpenEditModal(true);
@@ -233,6 +261,7 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
         productQuantity,
         productImageURL,
         addProduct,
+        categories,
       }}
     >
       {children}

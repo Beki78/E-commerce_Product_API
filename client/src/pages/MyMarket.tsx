@@ -8,6 +8,21 @@ import { ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Footer5 from "../components/Footer";
 
+interface CategoryMap {
+  [key: string]: string; // Any string key maps to a string value
+}
+
+const categoryMap: CategoryMap = {
+  FD: "Food",
+  EL: "Electronics",
+  CL: "Clothing",
+  FN: "Furniture",
+  HM: "Home",
+  VH: "Vehicle",
+  HA: "Home Accessories",
+};
+const baseURL = "http://127.0.0.1:8000"; 
+
 const MyMarket = () => {
   const context = useContext(MyContext);
 
@@ -24,7 +39,7 @@ const MyMarket = () => {
     <>
       <Navbar />
       <div className="min-h-screen">
-        {" "}
+      
         <section
           id="ProductCard"
           className="w-fit mx-auto  grid grid-cols-1 lg:grid-cols-3 md:grid-cols-2 justify-items-center gap-y-20 gap-x-14 mt-10 mb-5"
@@ -37,10 +52,10 @@ const MyMarket = () => {
               key={product.id}
               className="relative w-72 bg-white shadow-md rounded-xl duration-300 hover:shadow-xl"
             >
-              <a href="#">
+          
                 <div className="overflow-hidden rounded-t-xl">
                   <img
-                    src={product.imageUrl}
+                    src={`${baseURL}${product.image_url}`} // Combine the base URL with the relative path
                     alt={product.name}
                     className="h-80 w-72 object-cover transition-transform duration-300 hover:scale-105"
                   />
@@ -50,7 +65,8 @@ const MyMarket = () => {
                     {product.name}
                   </p>
                   <span className="text-gray-400 mr-3 uppercase text-xs">
-                    {product.category.name}
+                    {categoryMap[product.category] || product.category}
+                    {/* Display full name */}
                   </span>
                   <p className="text-sm text-gray-600">{product.description}</p>
                   <div className="flex items-center">
@@ -71,7 +87,6 @@ const MyMarket = () => {
                     </div>
                   </div>
                 </div>
-              </a>
               <div className="absolute top-2 right-2 flex space-x-2 bg-white shadow-md shadow-black p-1 rounded-lg">
                 <button
                   className="text-blue-600 hover:text-blue-800"

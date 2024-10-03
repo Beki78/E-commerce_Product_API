@@ -1,7 +1,20 @@
   import { useContext } from "react";
   import { IoBagAddOutline } from "react-icons/io5";
-  import { MyContext } from "../context/state"; // Update this import to point to your context file
+  import { MyContext } from "../context/state"; 
 
+interface CategoryMap {
+  [key: string]: string; 
+}
+const baseURL = "http://127.0.0.1:8000"; 
+const categoryMap: CategoryMap = {
+  FD: "Food",
+  EL: "Electronics",
+  CL: "Clothing",
+  FN: "Furniture",
+  HM: "Home",
+  VH: "Vehicle",
+  HA: "Home Accessories",
+};
   const ProductCard = () => {
     const { products,setCurrentId } = useContext(MyContext) || { products: [] }; 
     return (
@@ -11,17 +24,16 @@
       >
         {products.map((product) => (
           <div
-             onClick={() => {
-            setCurrentId?.(product.id);
-             
-          }}
+            onClick={() => {
+              setCurrentId?.(product.id);
+            }}
             key={product.id}
             className="w-72 bg-white shadow-md rounded-xl duration-300 hover:shadow-xl"
           >
-            <a href="#">
+            <a href="">
               <div className="overflow-hidden rounded-t-xl">
                 <img
-                  src={product.imageUrl}
+                  src={`${baseURL}${product.image_url}`} // Combine the base URL with the relative path
                   alt={product.name}
                   className="h-80 w-72 object-cover transition-transform duration-300 hover:scale-105"
                 />
@@ -31,7 +43,8 @@
                   {product.name}
                 </p>
                 <span className="text-gray-400 mr-3 uppercase text-xs">
-                  {product.category.name}
+                  {categoryMap[product.category] || product.category}
+                  {/* Display full name */}
                 </span>
                 <p className="text-sm text-gray-600">{product.description}</p>
                 <div className="flex items-center">

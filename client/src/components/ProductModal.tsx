@@ -27,7 +27,7 @@ const ProductModal = ({ title, buttonName }: Props) => {
     setProductDesc,
     setProductCategory,
     setProductPrice,
-    // setProductImageURL,
+    setProductImageURL,
     setProductQuantity,
     productCategory,
     productDesc,
@@ -36,13 +36,11 @@ const ProductModal = ({ title, buttonName }: Props) => {
     // productImageURL,
     productName,
     addProduct,
+    categories,
   } = context;
   const currentProduct = products.find((product) => product.id === currentId);
-  const uniqueCategories = products
-    .map((product) => product.category)
-    .filter(
-      (value, index, self) => index === self.findIndex((t) => t.id === value.id)
-    );
+
+
 
   // const [newProduct, setNewProduct] = useState({
   //   name: "",
@@ -58,6 +56,9 @@ const ProductModal = ({ title, buttonName }: Props) => {
     if (currentProduct) {
       setProductName(currentProduct.name || "");
       setProductDesc(currentProduct.description || "");
+      setProductPrice(currentProduct.price || 0);
+      setProductCategory(currentProduct.category || "");
+      setProductQuantity(currentProduct.stock_quantity || 0);
     }
   }, [currentProduct]);
 
@@ -85,6 +86,21 @@ const ProductModal = ({ title, buttonName }: Props) => {
             <>
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700">
+                  Product Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*" // Accept only image files
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setProductImageURL(e.target.files[0]); // Set the selected image file
+                    }
+                  }}
+                />
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">
                   Name
                 </label>
                 <input
@@ -128,9 +144,8 @@ const ProductModal = ({ title, buttonName }: Props) => {
                   value={productCategory}
                   onChange={(e) => setProductCategory(e.target.value)}
                 >
-                  <option value="">Select Category</option>{" "}
-              
-                  {uniqueCategories.map((category) => (
+                  <option value="">Select Category</option>
+                  {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
@@ -154,6 +169,21 @@ const ProductModal = ({ title, buttonName }: Props) => {
             <>
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700">
+                  Product Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*" // Accept only image files
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setProductImageURL(e.target.files[0]); // Set the selected image file
+                    }
+                  }}
+                />
+              </div>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700">
                   Name
                 </label>
                 <input
@@ -197,9 +227,8 @@ const ProductModal = ({ title, buttonName }: Props) => {
                   value={productCategory}
                   onChange={(e) => setProductCategory(e.target.value)}
                 >
-                  <option value="">Select Category</option>{" "}
-                  {/* Default option */}
-                  {uniqueCategories.map((category) => (
+                  <option value="">Select Category</option>
+                  {categories.map((category) => (
                     <option key={category.id} value={category.id}>
                       {category.name}
                     </option>
