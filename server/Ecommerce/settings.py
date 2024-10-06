@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os 
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,10 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-1zt**8lzn+y-l2@mwflanjoiugm4g5dc=!)z#nt6x%(iak+4s='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -79,14 +79,16 @@ WSGI_APPLICATION = 'Ecommerce.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.parse("postgresql://ecommercedatabase_itrp_user:OsltizrsPBhk8UKawWQnjVVb9IH0cvbA@dpg-cs18tjggph6c73ai4ieg-a.oregon-postgres.render.com/ecommercedatabase_itrp")
 }
-
-
 
 
 REST_FRAMEWORK = {
@@ -140,16 +142,6 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'ecommerce_db',  # Replace with your database name
-#         'USER': 'root',           # Replace with your MySQL username
-#         'PASSWORD': 'yourpassword',  # Replace with your MySQL password
-#         'HOST': 'localhost',
-#         'PORT': '3306',
-#     }
-# }
 
 
 CORS_ALLOWED_ORIGINS = [
