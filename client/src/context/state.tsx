@@ -225,8 +225,9 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
     axios
       .get("http://127.0.0.1:8000/api/products")
       .then((response) => {
-        setProducts(response.data);
-        console.log(response.data);
+        setProducts(response.data.results);
+        console.log(response.data.results);
+        console.log("Products state:", products);
         setLoading(false);
       })
       .catch((err) => {

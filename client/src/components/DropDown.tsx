@@ -14,10 +14,8 @@ const DropDown = () => {
 
   const { setOpen, triggerSellModal } = context;
   const menuItems = [
-    { name: "My Profile", href: "#" },
     { name: "My Market", href: "/my_market" },
   ];
-
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>

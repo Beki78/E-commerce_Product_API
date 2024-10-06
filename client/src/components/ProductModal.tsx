@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Dialog } from "@headlessui/react";
 import { IoMdClose } from "react-icons/io";
 import { MyContext } from "../context/state";
@@ -19,8 +19,6 @@ const ProductModal = ({ title, buttonName }: Props) => {
     setOpenEditModal,
     openEditModal,
     // notifyUpdate,
-    products,
-    currentId,
     modalAction,
     updateProduct,
     setProductName,
@@ -37,24 +35,24 @@ const ProductModal = ({ title, buttonName }: Props) => {
     addProduct,
     categories,
   } = context;
- const currentProduct = products.find((product) => product.id === currentId);
+//  const currentProduct = products.find((product) => product.id === currentId);
 
-  useEffect(() => {
-    if (currentProduct) {
-      setProductName(currentProduct.name || "");
-      setProductDesc(currentProduct.description || "");
-      setProductPrice(currentProduct.price || 0);
-      setProductCategory(currentProduct.category || "");
-      setProductQuantity(currentProduct.stock_quantity || 0);
-    }
-  }, [
-    currentProduct,
-    setProductName,
-    setProductDesc,
-    setProductPrice,
-    setProductCategory,
-    setProductQuantity,
-  ]);
+//   useEffect(() => {
+//     if (currentProduct) {
+//       setProductName(currentProduct.name || "");
+//       setProductDesc(currentProduct.description || "");
+//       setProductPrice(currentProduct.price || 0);
+//       setProductCategory(currentProduct.category || "");
+//       setProductQuantity(currentProduct.stock_quantity || 0);
+//     }
+//   }, [
+//     currentProduct,
+//     setProductName,
+//     setProductDesc,
+//     setProductPrice,
+//     setProductCategory,
+//     setProductQuantity,
+//   ]);
   return (
     <Dialog
       className="relative z-10"

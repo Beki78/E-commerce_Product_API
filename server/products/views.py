@@ -2,19 +2,32 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status, generics
 from django.contrib.auth import authenticate
-from .models import Product, User
-from .serializers import ProductSerializer, UserRegistrationSerializer, UserLoginSerializer
+from .models import Product, Order, OrderItem
+from .serializers import ProductSerializer, OrderSerializer, OrderItemSerializer
 from rest_framework.permissions import AllowAny
+from rest_framework.pagination import PageNumberPagination
 
-# Get all products
-
+class ProductPagination(PageNumberPagination):
+    page_size = 6  # Number of items per page
+    page_size_query_param = 'page_size'  # Allow clients to set page size
+    max_page_size = 100  # Limit the maximum page size
 
 @api_view(['GET'])
 def getProducts(request):
+    search = request.query_params.get('search', None)
+    category = request.query_params.get('category', None)  # Get category query parameter
     products = Product.objects.all()
-    serializedProduct = ProductSerializer(products, many=True).data
-    return Response(serializedProduct)
 
+    if search:
+        products = products.filter(name__icontains=search)
+
+    if category:
+        products = products.filter(category=category)  # Filter by category
+
+    paginator = ProductPagination()
+    paginated_products = paginator.paginate_queryset(products, request)
+    serializedProducts = ProductSerializer(paginated_products, many=True).data
+    return paginator.get_paginated_response(serializedProducts)
 # Get a single product by ID
 
 
@@ -61,27 +74,6 @@ def getProductsByCategory(request, category):
     return Response(serializedProduct.data, status=status.HTTP_200_OK)
 
 
-# @api_view(['GET'])
-# def getProductsByCategory(request, category):
-#     # Check if the category is one of "VH", "FD", or "CL"
-#     if category in ["VH", "FD", "CL", "EL", "FN", "HM", "HA"]:
-#         products = Product.objects.filter(category=category)
-
-#         # If no products exist, return a success response with a message
-#         if not products.exists():
-#             return Response({"message": "No products found for this category."}, status=status.HTTP_200_OK)
-
-#         # If products are found, serialize and return them
-#         serializedProduct = ProductSerializer(products, many=True)
-#         return Response(serializedProduct.data, status=status.HTTP_200_OK)
-
-#     # If the category is not one of "VH", "FD", or "CL", return a 404 error
-#     return Response({"error": "Invalid category."}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-# Update or delete a product by ID
-
 
 @api_view(['PUT', 'DELETE'])
 def productDetails(request, pk):
@@ -110,28 +102,33 @@ def productDetails(request, pk):
         return Response(serializedProduct.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# User registration view
 
 
-class UserRegistrationView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserRegistrationSerializer
-    permission_classes = [AllowAny]
 
-# User login view
+class OrderListCreateView(generics.ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
 
+    def create(self, request, *args, **kwargs):
+        # Custom creation logic if needed
+        return super().create(request, *args, **kwargs)
 
-class UserLoginView(generics.GenericAPIView):
-    serializer_class = UserLoginSerializer
-    permission_classes = [AllowAny]
+class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
 
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        email = serializer.validated_data['email']
-        password = serializer.validated_data['password']
-        user = authenticate(request, email=email, password=password)
+# OrderItem Views
+class OrderItemListCreateView(generics.ListCreateAPIView):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
 
-        if user is not None:
-            return Response({'message': 'Login successful', 'user_id': user.id}, status=status.HTTP_200_OK)
-        return Response({'message': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+    def get_queryset(self):
+        # Optionally filter order items by order ID
+        order_id = self.request.query_params.get('order_id', None)
+        if order_id:
+            return self.queryset.filter(order_id=order_id)
+        return self.queryset
+
+class OrderItemDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer

@@ -4,17 +4,22 @@ from .views import (
     createProducts,
     productDetails,
     getProduct,
-    UserRegistrationView,
-    UserLoginView,
-    getProductsByCategory
+    getProductsByCategory, 
+    OrderListCreateView,
+    OrderDetailView,
+    OrderItemListCreateView,
+    OrderItemDetailView
 )
 
-urlpatterns = [
+urlpatterns = [ 
     path("products/", getProducts, name="getProducts"),
     path("products/create", createProducts, name="createProducts"),
     path("product_details/<int:pk>", productDetails, name="productDetails"),
     path("product/<int:pk>", getProduct, name="getProduct"),
     path("products/category/<str:category>/", getProductsByCategory, name="getProductsByCategory"),
-    path('register/', UserRegistrationView.as_view(), name='register'),
-    path('login/', UserLoginView.as_view(), name='login'),
+    path('orders/', OrderListCreateView.as_view(), name='order-list-create'),
+    path('orders/<int:pk>/', OrderDetailView.as_view(), name='order-detail'),
+    path('order-items/', OrderItemListCreateView.as_view(), name='order-item-list-create'),
+    path('order-items/<int:pk>/', OrderItemDetailView.as_view(), name='order-item-detail'),
+    
 ]

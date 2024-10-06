@@ -1,10 +1,8 @@
 from rest_framework import serializers
-from .models import Product, Order, OrderItem, Review, User
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from .models import Product, Order, OrderItem
 
 
+#*ProductSerializer
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -29,54 +27,26 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        # If you want to include category name as string representation, do so here
         representation['category'] = instance.category
         return representation
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    # or use UserSerializer if you want more details
-    user = serializers.StringRelatedField()
-
-    class Meta:
-        model = Review
-        fields = ['id', 'user', 'product', 'rating', 'comment', 'created_at']
-
-
+#*OrderItemSerializer
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
-
     class Meta:
         model = OrderItem
         fields = ['id', 'order', 'product', 'quantity', 'unit_price']
 
 
+#*OrderSerializer
 class OrderSerializer(serializers.ModelSerializer):
     order_items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'status', 'total_price',
+        fields = ['id', 'status', 'total_price',
                   'created_at', 'updated_at', 'order_items']
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
 
-    class Meta:
-        model = User
-        fields = ['username', 'email', 'password']
-
-    def create(self, validated_data):
-        user = User(
-            username=validated_data['username'],
-            email=validated_data['email'],
-        )
-        user.set_password(validated_data['password'])  # Hash the password
-        user.save()
-        return user
-
-
-class UserLoginSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
