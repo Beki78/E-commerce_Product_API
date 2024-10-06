@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom"; // Corrected import
 import { FiTwitter, FiFacebook, FiInstagram } from "react-icons/fi";
 

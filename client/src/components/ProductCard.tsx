@@ -17,7 +17,7 @@ interface Product {
 }
 
 // Base URL for API
-const baseURL = "http://127.0.0.1:8000";
+const baseURL = "https://e-commerce-product-api-xhr1.onrender.com";
 
 // Category mapping
 const categoryMap: CategoryMap = {

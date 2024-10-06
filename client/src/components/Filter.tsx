@@ -4,7 +4,6 @@ import {
   Menu,
   MenuItems,
 } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { FunnelIcon } from "@heroicons/react/20/solid";
 import ProductCard from "./ProductCard";
 import { MyContext } from "../context/state";
@@ -13,10 +12,16 @@ import axios from "axios";
 
 
 export default function Filter() {
-  const { setSelectedCategory, setProducts } = useContext(MyContext);
+  const context = useContext(MyContext);
+  if (!context) {
+    throw new Error("Filter must be used within a MyProvider");
+  }
+  const { setProducts } = context;
+
+  
 
   const fetchProducts = (search = "") => {
-    const url = `http://127.0.0.1:8000/api/products/?search=${search}`; // Ensure the query string is correct
+    const url = `https://e-commerce-product-api-xhr1.onrender.com/api/products/?search=${search}`; // Ensure the query string is correct
     axios
       .get(url)
       .then((response) => {
@@ -30,8 +35,8 @@ export default function Filter() {
 
 
   useEffect(() => {
-    fetchProducts(); // Fetch all products on initial render
-  }, []); // Fetch products when component mounts
+    fetchProducts(); 
+  }, []); 
 
   return (
     <div className="bg-white">

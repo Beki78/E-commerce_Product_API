@@ -141,7 +141,7 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
 
       axios
         .put(
-          `http://127.0.0.1:8000/api/product_details/${currentId}`,
+          `https://e-commerce-product-api-xhr1.onrender.com/api/product_details/${currentId}`,
           formData,
           {
             headers: {
@@ -180,11 +180,15 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
     }
 
     axios
-      .post("http://127.0.0.1:8000/api/products/create", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data", // Ensure this header is set
-        },
-      })
+      .post(
+        "https://e-commerce-product-api-xhr1.onrender.com/api/products/create",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Ensure this header is set
+          },
+        }
+      )
       .then((response) => {
         setProducts((prevProducts) => [...prevProducts, response.data]);
         setOpenEditModal(false);
@@ -210,7 +214,9 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
     console.log(currentId);
 
     axios
-      .delete(`http://127.0.0.1:8000/api/product_details/${currentId}`)
+      .delete(
+        `https://e-commerce-product-api-xhr1.onrender.com/api/product_details/${currentId}`
+      )
       .then(() => {
         setProducts(products.filter((product) => product.id !== currentId));
         setOpen(false);
@@ -223,7 +229,7 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/products")
+      .get("https://e-commerce-product-api-xhr1.onrender.com/api/products")
       .then((response) => {
         setProducts(response.data.results);
         console.log(response.data.results);
@@ -234,15 +240,17 @@ export const ContextProvider: React.FC<{ children: ReactNode }> = ({
         console.error(err);
       })
       .finally(() => {
-         setLoading(false);
-      })
+        setLoading(false);
+      });
   }, []);
 
   useEffect(() => {
     if (selectedCategory) {
       setLoading(true); // Set loading to true when fetching starts
       axios
-        .get(`http://127.0.0.1:8000/api/products/category/${selectedCategory}`)
+        .get(
+          `https://e-commerce-product-api-xhr1.onrender.com/api/products/category/${selectedCategory}`
+        )
         .then((response) => {
           setProducts(response.data);
           console.log(response.data);

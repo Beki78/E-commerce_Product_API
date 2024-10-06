@@ -32,7 +32,7 @@ const categoryMap: CategoryMap = {
   HA: "Home Accessories",
 };
 
-const baseURL = "http://127.0.0.1:8000";
+const baseURL = "https://e-commerce-product-api-xhr1.onrender.com";
 
 const MyMarket = () => {
   const context = useContext(MyContext);

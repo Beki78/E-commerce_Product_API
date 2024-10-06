@@ -1,4 +1,3 @@
-import React from 'react'
 import Err from "../assets/undraw_Page_not_found_re_e9o6(1).png"
 const Error = () => {
   return (
