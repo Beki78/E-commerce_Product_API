@@ -11,7 +11,7 @@ export const loginApi = async (credentials: {
 }): Promise<FormType> => {
   try {
     const response = await api.post(
-      "http://127.0.0.1:8000/api-auth/login/",
+      `${import.meta.env.VITE_API_URL}/api-auth/login/`, 
       credentials
     );
     if (response) {

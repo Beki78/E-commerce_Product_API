@@ -1,22 +1,23 @@
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@reduxjs/toolkit/query";
-import { useEffect } from "react";
-import { fetchProduct } from "../features/product/ProductSlice";
+import Collections from "../components/Collection";
+import Footer5 from "../components/Footer";
+import Hero from "../components/Hero";
+import Navbar from "../components/Navbar";
+import NewsLetter from "../components/NewsLetter";
+import Stats from "../components/Stats";
+import Testimonials from "../components/Testimonials";
 
 const Home = () => {
-  const { products, isLoading } = useSelector(
-    (state: RootState) => state.products
+  return (
+    <div>
+      <Navbar />
+      <Hero/>
+      <Collections/>
+      <Stats/>
+      <Testimonials/>
+      <NewsLetter/>
+      <Footer5/>
+    </div>
   );
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchProduct());
-  }, [dispatch]);
-
-  useEffect(() => {
-    console.log("Fetched products:", products);
-  }, [products]);
-  return <div>Home</div>;
 };
 
 export default Home;

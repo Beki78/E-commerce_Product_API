@@ -1,11 +1,14 @@
 // DropDown.tsx
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { useNavigate } from "react-router-dom";
 // import Alert from "./Dailog";
 // import { MyContext } from "../context/state";
 // import { useContext } from "react";
 
 const DropDown = () => {
+
+  const navigate = useNavigate()
 //   const context = useContext(MyContext);
 
 //   if (!context) {
@@ -50,6 +53,7 @@ const DropDown = () => {
           <MenuItem>
             <button
             //   onClick={() => setOpen(true)}
+            onClick={() => navigate("/logout")}
               className="block w-full px-4 py-2 text-left text-sm text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none"
             >
               Sign out

@@ -1,24 +1,39 @@
-import { FaUserPlus } from "react-icons/fa";
-import IMG from "../assets/undraw_web_shopping_re_owap-removebg-preview.png";
-import { FormEvent, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { login } from "../features/auth/AuthSlice"; 
-import { RootState } from "../app/store";
+import { useState } from "react";
+import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { loginApi } from "../api/api";
+import { FaUserPlus } from "react-icons/fa";
+import IMG from "../assets/undraw_web_shopping_re_owap-removebg-preview.png"; 
 
-const Login = () => {
-  const dispatch = useDispatch();
-    const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+
+function Form() {
+  const ACCESS_TOKEN = "access";
+  const REFRESH_TOKEN = "refresh";
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { isLoading, error } = useSelector((state: RootState) => state.auth); 
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleLogin = async(e:FormEvent) => {
-    e.preventDefault(); 
-    console.log(email);
-    loginApi(email)
-    
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
+    e.preventDefault();
+
+    try {
+      const res = await api.post("http://127.0.0.1:8000/api/token/", { username, password });
+      if (res) {
+        console.log("Setting access token:", res.data.access);
+        localStorage.setItem(ACCESS_TOKEN, res.data.access);
+        localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
+        console.log("Access token set:", localStorage.getItem(ACCESS_TOKEN));
+        navigate("/");
+      } else {
+        navigate("/login");   
+      }
+    } catch (error) {
+      alert(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,15 +45,13 @@ const Login = () => {
               <div className="w-full flex-1 mt-8">
                 <div className="mx-auto max-w-xs">
                   <h1 className="text-center font-bold text-3xl my-8">Login</h1>
-                  {error && (
-                    <p className="text-red-500 text-sm text-center">{error}</p>
-                  )}
-                  <form onSubmit={handleLogin}>
+                  
+                  <form onSubmit={handleSubmit}>
                     <input
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
                       type="text"
                       placeholder="Email"
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => setUsername(e.target.value)}
                       required
                     />
                     <input
@@ -52,11 +65,11 @@ const Login = () => {
                     <button
                       type="submit"
                       className="mt-5 tracking-wide font-semibold bg-green-400 text-white w-full py-4 rounded-lg hover:bg-green-600 transition-all duration-300 ease-in-out flex items-center justify-center gap-2 focus:shadow-outline focus:outline-none"
-                      disabled={isLoading} 
+                      disabled={loading}
                     >
                       <FaUserPlus className="w-6 h-6 text-black" />
                       <span className="ml-2 text-black">
-                        {isLoading ? "Logging in..." : "Log In"}
+                        {loading ? "Logging in..." : "Log In"}
                       </span>
                     </button>
                   </form>
@@ -74,6 +87,6 @@ const Login = () => {
       </div>
     </div>
   );
-};
+}
 
-export default Login;
+export default Form;
