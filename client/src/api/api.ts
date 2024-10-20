@@ -6,12 +6,12 @@ const ACCESS_TOKEN = "access";
 const REFRESH_TOKEN = "refresh";
 
 export const loginApi = async (credentials: {
-  email: string;
+  username: string;
   password: string;
 }): Promise<FormType> => {
   try {
     const response = await api.post(
-      `${import.meta.env.VITE_API_URL}/api-auth/login/`, 
+      `${import.meta.env.VITE_API_URL}/api/token/`, 
       credentials
     );
     if (response) {

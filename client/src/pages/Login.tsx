@@ -1,40 +1,41 @@
 import { useState } from "react";
-import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { FaUserPlus } from "react-icons/fa";
 import IMG from "../assets/undraw_web_shopping_re_owap-removebg-preview.png"; 
+import { useDispatch, useSelector } from "react-redux";
+import { login, loginFailed, loginSuccess } from "../features/auth/AuthSlice";
+import { loginApi } from "../api/api";
+import { RootState } from "../app/store";
+import LoadingIndicator from "../components/LoadingIndicator";
+import { ToastContainer, Bounce, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { setCurrentUser } from "../features/auth/CurrentUserSlice";
 
 
 function Form() {
-  const ACCESS_TOKEN = "access";
-  const REFRESH_TOKEN = "refresh";
+const {  isLoading } = useSelector((state: RootState) => state.auth);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+ 
   const navigate = useNavigate();
+const dispatch = useDispatch();
 
+   const handleSubmit = async (e: React.FormEvent) => {
+     e.preventDefault(); 
+     dispatch(login({ username, password }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    setLoading(true);
-    e.preventDefault();
-
-    try {
-      const res = await api.post("http://127.0.0.1:8000/api/token/", { username, password });
-      if (res) {
-        console.log("Setting access token:", res.data.access);
-        localStorage.setItem(ACCESS_TOKEN, res.data.access);
-        localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-        console.log("Access token set:", localStorage.getItem(ACCESS_TOKEN));
-        navigate("/");
-      } else {
-        navigate("/login");   
-      }
-    } catch (error) {
-      alert(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+     try {
+       const userData = await loginApi({ username, password });
+       dispatch(loginSuccess(userData));
+       navigate("/");
+       dispatch(setCurrentUser(username));
+       // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     } catch (error) {
+      const errorMessage =  "Login failed";
+      toast.error(errorMessage); 
+      dispatch(loginFailed(errorMessage));
+     }
+   };
 
   return (
     <div>
@@ -45,7 +46,7 @@ function Form() {
               <div className="w-full flex-1 mt-8">
                 <div className="mx-auto max-w-xs">
                   <h1 className="text-center font-bold text-3xl my-8">Login</h1>
-                  
+
                   <form onSubmit={handleSubmit}>
                     <input
                       className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white"
@@ -65,11 +66,11 @@ function Form() {
                     <button
                       type="submit"
                       className="mt-5 tracking-wide font-semibold bg-green-400 text-white w-full py-4 rounded-lg hover:bg-green-600 transition-all duration-300 ease-in-out flex items-center justify-center gap-2 focus:shadow-outline focus:outline-none"
-                      disabled={loading}
+                      // disabled={loading}
                     >
                       <FaUserPlus className="w-6 h-6 text-black" />
                       <span className="ml-2 text-black">
-                        {loading ? "Logging in..." : "Log In"}
+                        {isLoading ? "Logging in..." : "Log In"}
                       </span>
                     </button>
                   </form>
@@ -85,6 +86,19 @@ function Form() {
           </div>
         </div>
       </div>
+      {isLoading && <LoadingIndicator />}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        transition={Bounce}
+      />
     </div>
   );
 }
