@@ -3,10 +3,19 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Product, Order, OrderItem
 from .serializers import UserSerializer, ProductSerializer, OrderSerializer, OrderItemSerializer
+from rest_framework.pagination import PageNumberPagination
 
+
+class ProductPagination(PageNumberPagination):
+    page_size = 6  
+    page_size_query_param = 'page_size'  
+    max_page_size = 100  
+    
+    
 class ProductListCreateView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
     permission_classes = [IsAuthenticated]  
+    pagination_class = ProductPagination 
 
     def get_queryset(self):
         user = self.request.user
@@ -22,17 +31,20 @@ class ProductListCreateView(generics.ListCreateAPIView):
 
 class ProductListCreateAllView(generics.ListCreateAPIView):
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [AllowAny]
+    pagination_class = ProductPagination 
 
     def get_queryset(self):
-        return Product.objects.all()  
+        print("View accessed")  # Debugging line
+        queryset = Product.objects.all()
+        category = self.request.query_params.get('category', None)
+        print("Category Filter:", category)  # Debugging line
 
-    def perform_create(self, serializer):
-        if serializer.is_valid():
-            serializer.save(author=self.request.user)
-        else:
-            print(serializer.errors) 
-            return serializer.error
+        if category is not None:
+            queryset = queryset.filter(category=category)
+            print("Filtered Queryset Count:", queryset.count())  # Debugging line
+
+        return queryset
 
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):

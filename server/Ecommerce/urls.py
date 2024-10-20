@@ -3,7 +3,8 @@ from django.contrib import admin
 from django.urls import path, include
 from products.views import CreateUserView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
+from django.conf.urls.static import static
+from django.conf import settings
 
 
 urlpatterns = [
@@ -13,4 +14,4 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh"),
     path("api-auth/", include("rest_framework.urls")),
     path("api/", include("products.urls")),
-]
+] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
