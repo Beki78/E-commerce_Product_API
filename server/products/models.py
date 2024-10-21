@@ -2,6 +2,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
+
+
+
 # * Product Schema
 class Product(models.Model):
     class CategoryChoices(models.TextChoices):
@@ -31,6 +34,7 @@ class Product(models.Model):
         return self.name
 
 
+
 # * Order Schema
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -47,6 +51,8 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Order {self.id} - {self.status}'
+
+
 
 
 # * Order Items Schema

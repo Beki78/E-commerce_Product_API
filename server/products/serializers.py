@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Product, Order, OrderItem
 
+
+
+#*  User Serializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -26,6 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
+#*  Product Serializer
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
@@ -36,6 +40,8 @@ class ProductSerializer(serializers.ModelSerializer):
         if value < 0:
             raise serializers.ValidationError("Stock quantity cannot be negative.")
         return value
+
+
 
 
 # * OrderSerializer
@@ -68,6 +74,8 @@ class OrderSerializer(serializers.ModelSerializer):
                     OrderItem.objects.create(order=instance, **item_data)
         
         return instance
+
+
 
 
 # * OrderItemSerializer

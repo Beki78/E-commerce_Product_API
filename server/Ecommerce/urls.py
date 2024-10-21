@@ -12,6 +12,6 @@ urlpatterns = [
     path("api/user/register/", CreateUserView.as_view(), name="register"),
     path("api/token/", TokenObtainPairView.as_view(), name="get_token"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh"),
-    path("api-auth/", include("rest_framework.urls")),
+    path("api-auth/", include("rest_framework.urls")),  
     path("api/", include("products.urls")),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
