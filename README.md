@@ -12,6 +12,9 @@ This project is an eCommerce application designed to provide users with a seamle
 - Image upload
 
 
+## ER Diagram
+
+![ER Diagram](https://github.com/Beki78/E-commerce_Product_API/blob/main/ER%20Diagram.png?raw=true)
 
 
 ## API Endpoints
